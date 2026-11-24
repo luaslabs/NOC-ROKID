@@ -19,7 +19,8 @@ export default {
     summary: '',
     observed: '',
     sites: [],
-    allSites: []
+    allSites: [],
+    selected: 0
   },
 
   onLoad() {
@@ -63,6 +64,36 @@ export default {
     } catch (e) {
       this.setData({ loading: false, error: e.message || 'NOC unavailable' })
     }
+  },
+
+  // Temple controls: swipe moves the highlight, tap opens it. Row 0 is "Lines and bills".
+  onKeyDown(event) {
+    console.log('[luaslink] key ' + event.code)
+  },
+
+  onKeyUp(event) {
+    const last = this.data.sites.length
+    if (event.code === 'ArrowDown' || event.code === 'ArrowRight') {
+      event.preventDefault()
+      this.select(Math.min(last, this.data.selected + 1))
+    } else if (event.code === 'ArrowUp' || event.code === 'ArrowLeft') {
+      event.preventDefault()
+      this.select(Math.max(0, this.data.selected - 1))
+    } else if (event.code === 'Enter') {
+      event.preventDefault()
+      this.openSelected()
+    }
+  },
+
+  select(index) {
+    this.setData({ selected: index })
+  },
+
+  openSelected() {
+    const i = this.data.selected
+    if (i === 0) return this.openLines()
+    const row = this.data.sites[i - 1]
+    if (row) wx.navigateTo({ url: '/pages/site/index?name=' + encodeURIComponent(row.name) })
   },
 
   openSite(event) {
@@ -121,19 +152,19 @@ export default {
       <text>{{error}}</text>
       <button bindtap="load">Retry</button>
     </view>
-    <scroll-view ink:else class="list" scroll-y="true">
-      <button class="row link" bindtap="openLines">
+    <scroll-view ink:else class="list" scroll-y="true" scroll-into-view="{{'row' + selected}}">
+      <button id="row0" class="row link {{selected === 0 ? 'on' : ''}}" bindtap="openLines">
         <text class="name">LINES AND BILLS</text>
         <text class="state">where each LUAS line is, paid or not</text>
       </button>
-      <button ink:for="{{sites}}" class="row {{item.warn ? 'warn' : ''}}" data-name="{{item.name}}" bindtap="openSite">
+      <button ink:for="{{sites}}" id="{{'row' + (index + 1)}}" class="row {{item.warn ? 'warn' : ''}} {{selected === index + 1 ? 'on' : ''}}" data-name="{{item.name}}" bindtap="openSite">
         <text class="name">{{item.warn ? '! ' : ''}}{{item.name}}</text>
         <text class="state">{{item.state}}  GW {{item.gw}}  AP {{item.ap}}  {{item.clients}} users</text>
       </button>
       <text ink:if="{{!sites.length}}" class="meta">No sites with devices.</text>
     </scroll-view>
 
-    <text class="meta hint">{{heard || 'Swipe to move, tap to open. Say Hi Rokid, then a site or LUAS line.'}}</text>
+    <text class="meta hint">{{heard || 'Swipe to move, tap to open. Hi Rokid + site or LUAS line.'}}</text>
   </view>
 </page>
 
@@ -146,6 +177,8 @@ export default {
 .list { flex: 1; min-height: 0; }
 .hint { margin-top: 4px; }
 .link { border-style: dashed; }
+.on { border-color: #40ff5e; border-width: 2px; background-color: rgba(64,255,94,0.16); }
+.on .name { color: #40ff5e; font-weight: 500; }
 .row { display: flex; flex-direction: column; align-items: flex-start; padding: 6px 8px; margin-bottom: 4px; border: 1px solid rgba(64,255,94,0.24); border-radius: 4px; background-color: #000000; text-align: left; }
 .row:focus { border-color: #40ff5e; background-color: rgba(64,255,94,0.12); }
 .warn { border-color: rgba(64,255,94,0.72); border-width: 2px; }
