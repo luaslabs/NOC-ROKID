@@ -66,6 +66,7 @@ export default {
     }
   },
 
+  // Rokid temple: swipe forward sends ArrowUp, swipe backward ArrowDown.
   // Temple controls: swipe moves the highlight, tap opens it. Row 0 is "Lines and bills".
   onKeyDown(event) {
     console.log('[luaslink] key ' + event.code)
@@ -73,10 +74,10 @@ export default {
 
   onKeyUp(event) {
     const last = this.data.sites.length
-    if (event.code === 'ArrowDown' || event.code === 'ArrowRight') {
+    if (event.code === 'ArrowUp' || event.code === 'ArrowRight') {
       event.preventDefault()
       this.select(Math.min(last, this.data.selected + 1))
-    } else if (event.code === 'ArrowUp' || event.code === 'ArrowLeft') {
+    } else if (event.code === 'ArrowDown' || event.code === 'ArrowLeft') {
       event.preventDefault()
       this.select(Math.max(0, this.data.selected - 1))
     } else if (event.code === 'Enter') {
@@ -154,11 +155,11 @@ export default {
     </view>
     <scroll-view ink:else class="list" scroll-y="true" scroll-into-view="{{'row' + selected}}">
       <button id="row0" class="row link {{selected === 0 ? 'on' : ''}}" bindtap="openLines">
-        <text class="name">LINES AND BILLS</text>
+        <text class="name">{{selected === 0 ? '> ' : ''}}LINES AND BILLS</text>
         <text class="state">where each LUAS line is, paid or not</text>
       </button>
       <button ink:for="{{sites}}" id="{{'row' + (index + 1)}}" class="row {{item.warn ? 'warn' : ''}} {{selected === index + 1 ? 'on' : ''}}" data-name="{{item.name}}" bindtap="openSite">
-        <text class="name">{{item.warn ? '! ' : ''}}{{item.name}}</text>
+        <text class="name">{{selected === index + 1 ? '> ' : ''}}{{item.warn ? '! ' : ''}}{{item.name}}</text>
         <text class="state">{{item.state}}  GW {{item.gw}}  AP {{item.ap}}  {{item.clients}} users</text>
       </button>
       <text ink:if="{{!sites.length}}" class="meta">No sites with devices.</text>
