@@ -1,0 +1,11 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/site/index",
+    "pages/lines/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "LuasLink NOC"
+  },
+  "permissions": ["RECORD_AUDIO"]
+}
