@@ -3,5 +3,6 @@
 // Never commit config.js or put a "Read + write" token here.
 export default {
   nocUrl: 'https://noc.luaslink.com',
-  token: 'noc_mcp_PASTE_READ_ONLY_TOKEN_HERE'
+  // The bare token, or the full connector URL from NOC (…/mcp/<token>).
+  token: 'PASTE_READ_ONLY_TOKEN_HERE'
 }
