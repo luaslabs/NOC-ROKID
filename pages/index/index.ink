@@ -20,7 +20,7 @@ export default {
     observed: '',
     sites: [],
     allSites: [],
-    selected: 0
+    selected: 0, start: 0, visible: []
   },
 
   onLoad() {
@@ -58,7 +58,7 @@ export default {
         error: snap.error && !all.length ? snap.error : '',
         summary: bad.length ? bad.length + ' SITE PROBLEM' + (bad.length > 1 ? 'S' : '') : 'ALL SITES OK',
         observed: snap.observedAt ? 'updated ' + clock(snap.observedAt) + (snap.stale ? ' (old)' : '') : '',
-        sites: rows,
+        sites: rows, ...this.windowAt(Math.min(this.data.selected, rows.length), rows),
         allSites: all.map((s) => ({ name: s.name }))
       })
     } catch (e) {
@@ -86,8 +86,8 @@ export default {
     }
   },
 
-  select(index) {
-    this.setData({ selected: index })
+  windowAt(index, sites) { const start = Math.max(0, index - 2); const first = Math.max(1, start); return { selected: index, start: start, visible: sites.slice(first - 1, start + 4).map((r, k) => Object.assign({}, r, { mark: first + k === index ? '> ' : '' })) } }, select(index) {
+    this.setData(this.windowAt(index, this.data.sites))
   },
 
   openSelected() {
@@ -153,17 +153,17 @@ export default {
       <text>{{error}}</text>
       <button bindtap="load">Retry</button>
     </view>
-    <scroll-view ink:else class="list" scroll-y="true" scroll-into-view="{{'row' + selected}}">
-      <button id="row0" class="row link {{selected === 0 ? 'on' : ''}}" bindtap="openLines">
+    <view ink:else class="list">
+      <button ink:if="{{start === 0}}" class="row link" bindtap="openLines">
         <text class="name">{{selected === 0 ? '> ' : ''}}LINES AND BILLS</text>
         <text class="state">where each LUAS line is, paid or not</text>
       </button>
-      <button ink:for="{{sites}}" id="{{'row' + (index + 1)}}" class="row {{item.warn ? 'warn' : ''}} {{selected === index + 1 ? 'on' : ''}}" data-name="{{item.name}}" bindtap="openSite">
-        <text class="name">{{selected === index + 1 ? '> ' : ''}}{{item.warn ? '! ' : ''}}{{item.name}}</text>
+      <button ink:for="{{visible}}" class="row {{item.warn ? 'warn' : ''}}" data-name="{{item.name}}" bindtap="openSite">
+        <text class="name">{{item.mark}}{{item.warn ? '! ' : ''}}{{item.name}}</text>
         <text class="state">{{item.state}}  GW {{item.gw}}  AP {{item.ap}}  {{item.clients}} users</text>
       </button>
       <text ink:if="{{!sites.length}}" class="meta">No sites with devices.</text>
-    </scroll-view>
+    </view>
 
     <text class="meta hint">{{heard || 'Swipe to move, tap to open. Hi Rokid + site or LUAS line.'}}</text>
   </view>
