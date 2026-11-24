@@ -65,7 +65,7 @@ export default {
 <style>
 .screen { display: flex; flex-direction: column; padding: 12px 16px; height: 100%; }
 .title { font-size: 18px; font-weight: 500; color: #40ff5e; letter-spacing: 0.04em; margin-bottom: 8px; }
-.list { flex: 1; }
+.list { flex: 1; min-height: 0; }
 .row { display: flex; flex-direction: column; padding: 6px 8px; margin-bottom: 4px; border: 1px solid rgba(64,255,94,0.24); border-radius: 4px; }
 .warn { border-color: rgba(64,255,94,0.72); border-width: 2px; }
 .code { font-size: 14px; font-weight: 500; color: #40ff5e; }

@@ -1,13 +1,13 @@
 <script def>
 {
   "navigationBarTitleText": "LuasLink NOC",
-  "description": "Overview of LuasLink event sites: which are offline or have a device offline. Press to speak a site name, a line (LUAS2) or 'bills'."
+  "description": "Overview of LuasLink event sites: which are offline or have a device offline. Swipe to move, tap to open. Say 'Hi Rokid' then a site name, a line (LUAS2) or 'bills'."
 }
 </script>
 
 <script setup>
 import wx from 'wx'
-import { callTool, stateLabel, countText, understand } from '../../lib/noc.js'
+import { callTool, stateLabel, countText, understand, clock } from '../../lib/noc.js'
 
 const ORDER = { offline: 0, degraded: 1, unknown: 2, online: 3, empty: 4 }
 
@@ -56,7 +56,7 @@ export default {
         loading: false,
         error: snap.error && !all.length ? snap.error : '',
         summary: bad.length ? bad.length + ' SITE PROBLEM' + (bad.length > 1 ? 'S' : '') : 'ALL SITES OK',
-        observed: snap.observedAt ? 'updated ' + String(snap.observedAt).slice(11, 16) + (snap.stale ? ' (old)' : '') : '',
+        observed: snap.observedAt ? 'updated ' + clock(snap.observedAt) + (snap.stale ? ' (old)' : '') : '',
         sites: rows,
         allSites: all.map((s) => ({ name: s.name }))
       })
@@ -72,6 +72,12 @@ export default {
 
   openLines() {
     wx.navigateTo({ url: '/pages/lines/index' })
+  },
+
+  // "Hi Rokid" (or a temple-button wakeup) while this page is open: listen for a site, line or "bills".
+  onVoiceWakeup(event) {
+    event.preventDefault()
+    this.listen()
   },
 
   listen() {
@@ -116,6 +122,10 @@ export default {
       <button bindtap="load">Retry</button>
     </view>
     <scroll-view ink:else class="list" scroll-y="true">
+      <button class="row link" bindtap="openLines">
+        <text class="name">LINES AND BILLS</text>
+        <text class="state">where each LUAS line is, paid or not</text>
+      </button>
       <button ink:for="{{sites}}" class="row {{item.warn ? 'warn' : ''}}" data-name="{{item.name}}" bindtap="openSite">
         <text class="name">{{item.warn ? '! ' : ''}}{{item.name}}</text>
         <text class="state">{{item.state}}  GW {{item.gw}}  AP {{item.ap}}  {{item.clients}} users</text>
@@ -123,11 +133,7 @@ export default {
       <text ink:if="{{!sites.length}}" class="meta">No sites with devices.</text>
     </scroll-view>
 
-    <view class="foot">
-      <button class="act" bindtap="listen">Speak</button>
-      <button class="act" bindtap="openLines">Lines and bills</button>
-    </view>
-    <text ink:if="{{heard}}" class="meta">{{heard}}</text>
+    <text class="meta hint">{{heard || 'Swipe to move, tap to open. Say Hi Rokid, then a site or LUAS line.'}}</text>
   </view>
 </page>
 
@@ -137,14 +143,15 @@ export default {
 .title { font-size: 18px; font-weight: 500; color: #40ff5e; letter-spacing: 0.04em; }
 .meta { font-size: 11px; color: rgba(64,255,94,0.48); }
 .note { display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: rgba(64,255,94,0.72); }
-.list { flex: 1; }
-.row { display: flex; flex-direction: column; padding: 6px 8px; margin-bottom: 4px; border: 1px solid rgba(64,255,94,0.24); border-radius: 4px; background-color: #000000; text-align: left; }
+.list { flex: 1; min-height: 0; }
+.hint { margin-top: 4px; }
+.link { border-style: dashed; }
+.row { display: flex; flex-direction: column; align-items: flex-start; padding: 6px 8px; margin-bottom: 4px; border: 1px solid rgba(64,255,94,0.24); border-radius: 4px; background-color: #000000; text-align: left; }
 .row:focus { border-color: #40ff5e; background-color: rgba(64,255,94,0.12); }
 .warn { border-color: rgba(64,255,94,0.72); border-width: 2px; }
 .name { font-size: 14px; color: rgba(64,255,94,0.72); }
 .warn .name { color: #40ff5e; font-weight: 500; }
 .state { font-family: monospace; font-size: 11px; color: rgba(64,255,94,0.48); }
-.foot { display: flex; flex-direction: row; gap: 8px; margin-top: 6px; }
 .act { flex: 1; padding: 6px; font-size: 12px; color: rgba(64,255,94,0.72); border: 1px solid rgba(64,255,94,0.48); border-radius: 4px; background-color: #000000; }
 .act:focus { color: #40ff5e; border-color: #40ff5e; background-color: rgba(64,255,94,0.12); }
 </style>

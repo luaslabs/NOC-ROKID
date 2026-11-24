@@ -98,7 +98,7 @@ export default {
 .screen { display: flex; flex-direction: column; padding: 12px 16px; height: 100%; }
 .title { font-size: 16px; font-weight: 500; color: rgba(64,255,94,0.72); margin-bottom: 4px; }
 .big { font-size: 22px; font-weight: 500; color: #40ff5e; letter-spacing: 0.04em; }
-.body { flex: 1; }
+.body { flex: 1; min-height: 0; }
 .data { font-family: monospace; font-size: 13px; color: rgba(64,255,94,0.72); }
 .label { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; color: rgba(64,255,94,0.48); margin-top: 8px; padding-top: 4px; border-top: 1px solid rgba(64,255,94,0.24); }
 .item { font-size: 13px; color: rgba(64,255,94,0.72); }
