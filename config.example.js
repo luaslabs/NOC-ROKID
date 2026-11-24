@@ -1,8 +1,12 @@
-// Copy this file to config.js (in AIUI Studio: create config.js) and paste a
-// READ-ONLY connector token from noc.luaslink.com › Operators & connectors.
-// Never commit config.js or put a "Read + write" token here.
+// Copy this file to config.js (in AIUI Studio: create config.js) and paste the
+// tokens from noc.luaslink.com › Operators & connectors. Either the bare token
+// or the full connector URL (…/mcp/<token>) works.
+// Never commit config.js.
 export default {
   nocUrl: 'https://noc.luaslink.com',
-  // The bare token, or the full connector URL from NOC (…/mcp/<token>).
-  token: 'PASTE_READ_ONLY_TOKEN_HERE'
+  // Read only: status pages.
+  token: 'PASTE_READ_ONLY_TOKEN_HERE',
+  // Read + write, labelled "Rokid glasses (write)": spoken commands
+  // (create site, add VLANs / SSIDs, DPI). Leave as is to disable commands.
+  writeToken: 'PASTE_WRITE_TOKEN_HERE'
 }

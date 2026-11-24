@@ -115,7 +115,6 @@ export default {
   listen() {
     if (this.recognition) this.recognition.abort()
     const recognition = new SpeechRecognition()
-    recognition.lang = 'en-US'
     recognition.onresult = (event) => {
       const text = event.results[event.resultIndex][0].transcript
       this.act(text)
@@ -131,11 +130,16 @@ export default {
   },
 
   act(text) {
+    if (/\b(create|buat|cipta|tambah|add|dpi|ssid)\b/i.test(text) || /\bvlan\b/i.test(text)) {
+      this.setData({ heard: '"' + text + '"' })
+      return wx.navigateTo({ url: '/pages/command/index?text=' + encodeURIComponent(text) })
+    }
     const intent = understand(text, this.data.allSites)
     this.setData({ heard: '"' + text + '"' })
     if (intent.kind === 'site') wx.navigateTo({ url: '/pages/site/index?name=' + encodeURIComponent(intent.site.name) })
     else if (intent.kind === 'line') wx.navigateTo({ url: '/pages/lines/index?line=' + intent.code })
     else if (intent.kind === 'lines') wx.navigateTo({ url: '/pages/lines/index' })
+    else if (/\b(create|buat|cipta|tambah|add|dpi|ssid|vlan)\b/i.test(text)) wx.navigateTo({ url: '/pages/command/index?text=' + encodeURIComponent(text) })
     else this.setData({ heard: '"' + text + '" - no match' })
   }
 }
@@ -165,7 +169,7 @@ export default {
       <text ink:if="{{!sites.length}}" class="meta">No sites with devices.</text>
     </view>
 
-    <text class="meta hint">{{heard || 'Swipe to move, tap to open. Hi Rokid + site or LUAS line.'}}</text>
+    <text class="meta hint">{{heard || 'Swipe, tap to open. Hi Rokid + site, LUAS line or command.'}}</text>
   </view>
 </page>
 
